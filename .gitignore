@@ -5,6 +5,8 @@ tmp/
 *.bak
 *.swp
 *~.nib
+*.xml
+*.iml
 local.properties
 .settings/
 .loadpath
@@ -47,3 +49,7 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
+
+# Out
+
+/out
