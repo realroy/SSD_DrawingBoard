@@ -1,11 +1,15 @@
 package main;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
-import objects.*;
+import objects.CompositeGObject;
+import objects.GObject;
 
 public class DrawingBoard extends JPanel {
 
@@ -25,18 +29,33 @@ public class DrawingBoard extends JPanel {
 	
 	public void addGObject(GObject gObject) {
 		// TODO: Implement this method.
+		gObjects.add(gObject);
+		repaint();
 	}
 	
 	public void groupAll() {
 		// TODO: Implement this method.
+		target.deselected();
+		CompositeGObject compositeGObject = new CompositeGObject();
+		gObjects.forEach(compositeGObject::add);
+		gObjects = new ArrayList<>();
+		compositeGObject.recalculateRegion();
+		addGObject(compositeGObject);
+		target = compositeGObject;
+		target.selected();
 	}
 
 	public void deleteSelected() {
 		// TODO: Implement this method.
+		gObjects.remove(target);
+		target = null;
+		repaint();
 	}
 	
 	public void clear() {
 		// TODO: Implement this method.
+		gObjects = new ArrayList<>();
+		repaint();
 	}
 	
 	@Override
@@ -76,16 +95,48 @@ public class DrawingBoard extends JPanel {
 		
 		private void deselectAll() {
 			// TODO: Implement this method.
+			gObjects.forEach(GObject::deselected);
+			repaint();
 		}
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
 			// TODO: Implement this method.
+			try {
+				int x = e.getX();
+				int y = e.getY();
+				boolean selectBlankSpace = true;
+				for (GObject g : gObjects) {
+					if (g.pointerHit(x, y)) {
+						if (target != null) {
+							target.deselected();
+						}
+						target = g;
+						target.selected();
+						selectBlankSpace = false;
+					}
+				}
+				if (selectBlankSpace) {
+					deselectAll();
+					target = null;
+				}
+				repaint();
+			} catch (Exception exception) {
+			}
+
 		}
 
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			// TODO: Implement this method.
+			try {
+				int x = e.getX();
+				int y = e.getY();
+				target.move(x, y);
+				repaint();
+			} catch (Exception exception) {
+			}
+
 		}
 	}
 	
