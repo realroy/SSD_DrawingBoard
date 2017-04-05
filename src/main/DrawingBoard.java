@@ -13,131 +13,120 @@ import objects.GObject;
 
 public class DrawingBoard extends JPanel {
 
-	private MouseAdapter mouseAdapter; 
-	private List<GObject> gObjects;
-	private GObject target;
-	
-	private int gridSize = 10;
-	
-	public DrawingBoard() {
-		gObjects = new ArrayList<GObject>();
-		mouseAdapter = new MAdapter();
-		addMouseListener(mouseAdapter);
-		addMouseMotionListener(mouseAdapter);
-		setPreferredSize(new Dimension(800, 600));
-	}
-	
-	public void addGObject(GObject gObject) {
-		// TODO: Implement this method.
-		gObjects.add(gObject);
-		repaint();
-	}
-	
-	public void groupAll() {
-		// TODO: Implement this method.
-		target.deselected();
-		CompositeGObject compositeGObject = new CompositeGObject();
-		gObjects.forEach(compositeGObject::add);
-		gObjects = new ArrayList<>();
-		compositeGObject.recalculateRegion();
-		addGObject(compositeGObject);
-		target = compositeGObject;
-		target.selected();
-	}
+  private MouseAdapter mouseAdapter;
+  private List<GObject> gObjects;
+  private GObject target;
 
-	public void deleteSelected() {
-		// TODO: Implement this method.
-		gObjects.remove(target);
-		target = null;
-		repaint();
-	}
-	
-	public void clear() {
-		// TODO: Implement this method.
-		gObjects = new ArrayList<>();
-		repaint();
-	}
-	
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		paintBackground(g);
-		paintGrids(g);
-		paintObjects(g);
-	}
+  private int gridSize = 10;
 
-	private void paintBackground(Graphics g) {
-		g.setColor(Color.white);
-		g.fillRect(0, 0, getWidth(), getHeight());
-	}
+  public DrawingBoard() {
+    gObjects = new ArrayList<GObject>();
+    mouseAdapter = new MAdapter();
+    addMouseListener(mouseAdapter);
+    addMouseMotionListener(mouseAdapter);
+    setPreferredSize(new Dimension(800, 600));
+  }
 
-	private void paintGrids(Graphics g) {
-		g.setColor(Color.lightGray);
-		int gridCountX = getWidth() / gridSize;
-		int gridCountY = getHeight() / gridSize;
-		for (int i = 0; i < gridCountX; i++) {
-			g.drawLine(gridSize * i, 0, gridSize * i, getHeight());
-		}
-		for (int i = 0; i < gridCountY; i++) {
-			g.drawLine(0, gridSize * i, getWidth(), gridSize * i);
-		}
-	}
+  public void addGObject(GObject gObject) {
+    // TODO: Implement this method.
+    gObjects.add(gObject);
+    repaint();
+  }
 
-	private void paintObjects(Graphics g) {
-		for (GObject go : gObjects) {
-			go.paint(g);
-		}
-	}
+  public void groupAll() {
+    // TODO: Implement this method.
+    target.deselected();
+    CompositeGObject compositeGObject = new CompositeGObject();
+    gObjects.forEach(compositeGObject::add);
+    gObjects = new ArrayList<>();
+    compositeGObject.recalculateRegion();
+    addGObject(compositeGObject);
+    target = compositeGObject;
+    target.selected();
+  }
 
-	class MAdapter extends MouseAdapter {
+  public void deleteSelected() {
+    // TODO: Implement this method.
+    gObjects.remove(target);
+    target = null;
+    repaint();
+  }
 
-		// TODO: You need some variables here
-		
-		private void deselectAll() {
-			// TODO: Implement this method.
-			gObjects.forEach(GObject::deselected);
-			repaint();
-		}
-		
-		@Override
-		public void mousePressed(MouseEvent e) {
-			// TODO: Implement this method.
-			try {
-				int x = e.getX();
-				int y = e.getY();
-				boolean selectBlankSpace = true;
-				for (GObject g : gObjects) {
-					if (g.pointerHit(x, y)) {
-						if (target != null) {
-							target.deselected();
-						}
-						target = g;
-						target.selected();
-						selectBlankSpace = false;
-					}
-				}
-				if (selectBlankSpace) {
-					deselectAll();
-					target = null;
-				}
-				repaint();
-			} catch (Exception exception) {
-			}
+  public void clear() {
+    // TODO: Implement this method.
+    gObjects = new ArrayList<>();
+    repaint();
+  }
 
-		}
+  @Override
+  public void paint(Graphics g) {
+    super.paint(g);
+    paintBackground(g);
+    paintGrids(g);
+    paintObjects(g);
+  }
 
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			// TODO: Implement this method.
-			try {
-				int x = e.getX();
-				int y = e.getY();
-				target.move(x, y);
-				repaint();
-			} catch (Exception exception) {
-			}
+  private void paintBackground(Graphics g) {
+    g.setColor(Color.white);
+    g.fillRect(0, 0, getWidth(), getHeight());
+  }
 
-		}
-	}
-	
+  private void paintGrids(Graphics g) {
+    g.setColor(Color.lightGray);
+    int gridCountX = getWidth() / gridSize;
+    int gridCountY = getHeight() / gridSize;
+    for (int i = 0; i < gridCountX; i++) {
+      g.drawLine(gridSize * i, 0, gridSize * i, getHeight());
+    }
+    for (int i = 0; i < gridCountY; i++) {
+      g.drawLine(0, gridSize * i, getWidth(), gridSize * i);
+    }
+  }
+
+  private void paintObjects(Graphics g) {
+    for (GObject go : gObjects) {
+      go.paint(g);
+    }
+  }
+
+  class MAdapter extends MouseAdapter {
+
+    // TODO: You need some variables here
+
+    private void deselectAll() {
+      // TODO: Implement this method.
+      gObjects.forEach(GObject::deselected);
+      repaint();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+      // TODO: Implement this method.
+      int x = e.getX();
+      int y = e.getY();
+      for (GObject g : gObjects) {
+        if (g.pointerHit(x, y)) {
+          if (target != null) {
+            deselectAll();
+          }
+          g.selected();
+          target = g;
+        }
+      }
+      repaint();
+    }
+
+  }
+
+  @Override
+  public void mouseDragged(MouseEvent e) {
+    // TODO: Implement this method.
+    if (target != null) {
+      int x = e.getX();
+      int y = e.getY();
+      target.move(x, y);
+      repaint();
+    }
+  }
+
 }
